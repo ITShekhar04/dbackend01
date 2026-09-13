@@ -1,0 +1,30 @@
+{
+  "name": "socialpulse-backend",
+  "version": "1.0.0",
+  "description": "Backend service for SocialPulse AI creator-analytics dashboard",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node test/test-contract.js && node test/test-live-flow.js && node test/test-pinterest-x.js && node test/test-comprehensive-verification.js && node test/test-government-suite.js"
+  },
+  "keywords": [
+    "youtube-analytics",
+    "youtube-data-api",
+    "socialpulse",
+    "creator-analytics",
+    "sentiment-analysis"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "node-cache": "^5.1.2",
+    "sqlite3": "^5.1.7",
+    "vader-sentiment": "^1.1.3"
+  }
+}
