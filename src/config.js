@@ -5,12 +5,13 @@ require('dotenv').config();
 const path = require('path');
 
 const config = {
-  port: parseInt(process.env.PORT, 10) || 5000,
+  port: parseInt(process.env.NODE_PORT, 10) || 5000,
   frontendOrigins: (process.env.FRONTEND_URL || 'http://localhost:3000,http://127.0.0.1:5500')
     .split(',')
     .map((origin) => origin.trim()),
 
   google: {
+    apiKey: process.env.YOUTUBE_API_KEY || '',
     clientId: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/auth/google/callback',
@@ -57,6 +58,16 @@ const config = {
     clientSecret: process.env.X_CLIENT_SECRET || '',
     redirectUri: process.env.X_REDIRECT_URI || 'http://localhost:5000/api/x/auth/callback',
     accessToken: process.env.X_ACCESS_TOKEN || ''
+  },
+
+  facebook: {
+    accessToken: process.env.FACEBOOK_ACCESS_TOKEN || '',
+    pageId: process.env.FACEBOOK_PAGE_ID || ''
+  },
+
+  telegram: {
+    apiKey: process.env.TELEGRAM_API_KEY || process.env.TELEGRAM_API_HASH || '',
+    apiHash: process.env.TELEGRAM_API_HASH || process.env.TELEGRAM_API_KEY || ''
   }
 };
 

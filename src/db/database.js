@@ -129,19 +129,111 @@ function initSchema() {
       )
     `);
 
+    // Timeline Conversations Table (Multi-Platform Real-time Chronology)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS timeline_conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        topic_id TEXT,
+        topic_name TEXT,
+        platform TEXT,
+        author TEXT,
+        author_handle TEXT,
+        snippet TEXT,
+        sentiment TEXT,
+        engagement_count INTEGER,
+        velocity_delta INTEGER,
+        city TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        is_bot INTEGER DEFAULT 0
+      )
+    `);
+
     // Seed Default Government Users if not present
     seedDefaultGovUsers();
+    seedDefaultTimelineConversations();
+    seedInitialAuditLogs();
+  });
+}
+
+function seedInitialAuditLogs() {
+  db.get('SELECT COUNT(*) as count FROM gov_audit_logs', [], (err, row) => {
+    if (err || (row && row.count > 0)) return;
+    const initialLogs = [
+      { email: 'admin@dhristi.gov.in', role: 'Administrator', action: 'SYSTEM_BOOT_ZERO_TRUST', resource: 'CORE_KERNEL', details: { mode: 'OPERATIONAL', level: 'LEVEL-5' }, ip: '10.0.12.1' },
+      { email: 'cert-in-dg@dhristi.gov.in', role: 'Director General, CERT-In', action: 'PERSONA_AUTHORIZATION', resource: 'NATIONAL_CYBER_DEFENSE', details: { clearance: 'LEVEL-5 TS/SCI', authority: 'Dr. Rajesh Kumar, IPS' }, ip: '10.0.12.4' },
+      { email: 'i4c@dhristi.gov.in', role: 'I4C Oversight', action: 'CFCFRMS_1930_GATEWAY_LINK', resource: 'FINANCIAL_FRAUD_INTAKE', details: { linkStatus: 'CONNECTED', activeQueues: 14 }, ip: '10.0.12.8' },
+      { email: 'system@dhristi.gov.in', role: 'System Engine', action: 'SECTION_21_SAFEGUARD_CHECK', resource: 'NARRATIVE_MONITOR', details: { policyCriticismProtection: 'STRICT_ACTIVE', verifiedNonSuppression: true }, ip: '127.0.0.1' },
+      { email: 'defense@dhristi.gov.in', role: 'Defense Analyst', action: 'DNS_SINKHOLE_ORDER_ISSUED', resource: 'PHISHING_NEXUS_CAMBODIA', details: { blockedDomains: 18, victimsSavedEst: 320 }, ip: '10.0.12.15' }
+    ];
+    initialLogs.forEach(l => {
+      logGovAudit(l);
+    });
+  });
+}
+
+function seedDefaultTimelineConversations() {
+  db.get('SELECT COUNT(*) as count FROM timeline_conversations', [], (err, row) => {
+    if (err || (row && row.count > 0)) return;
+    const seedData = [
+      // Farmers MSP
+      { topic_id: 'trend-farmers-protest', topic_name: 'Farmers MSP & Crop Dialogue', platform: 'X', author: 'Kisan Samiti Live', author_handle: '@kisansamiti_in', snippet: 'Formal memorandum submitted for statutory C2+50% legal procurement formula at Krishi Bhawan.', sentiment: 'neutral', engagement_count: 42100, velocity_delta: 24, city: 'New Delhi', is_bot: 0 },
+      { topic_id: 'trend-farmers-protest', topic_name: 'Farmers MSP & Crop Dialogue', platform: 'YouTube', author: 'Ground Zero Bharat', author_handle: '@groundzerobharat', snippet: 'Highway bypass advisory and live interview with agricultural economists regarding procurement tariffs.', sentiment: 'neutral', engagement_count: 185000, velocity_delta: 38, city: 'Ambala', is_bot: 0 },
+      { topic_id: 'trend-farmers-protest', topic_name: 'Farmers MSP & Crop Dialogue', platform: 'Instagram', author: 'AgriYouth Collective', author_handle: '@agriyouth_in', snippet: 'Infographic: State-wise fertilizer subsidy vs mandi gate pricing over 3 seasons.', sentiment: 'negative', engagement_count: 94000, velocity_delta: 19, city: 'Ludhiana', is_bot: 0 },
+      { topic_id: 'trend-farmers-protest', topic_name: 'Farmers MSP & Crop Dialogue', platform: 'Telegram', author: 'Kisan Morcha Wire', author_handle: '@kisanmorcha_official', snippet: 'District coordination delegates meeting at 14:00 IST to review negotiation draft.', sentiment: 'neutral', engagement_count: 56000, velocity_delta: 42, city: 'Chandigarh', is_bot: 0 },
+      { topic_id: 'trend-farmers-protest', topic_name: 'Farmers MSP & Crop Dialogue', platform: 'WhatsApp', author: 'Community Feed', author_handle: '+91 98*** 4120', snippet: 'Forwarded voice note confirming peaceful highway passage for emergency ambulances.', sentiment: 'positive', engagement_count: 120000, velocity_delta: 12, city: 'Patiala', is_bot: 0 },
+      { topic_id: 'trend-farmers-protest', topic_name: 'Farmers MSP & Crop Dialogue', platform: 'X', author: 'FastTrack NewsBot', author_handle: '@kisan_blast_441', snippet: 'Urgent tractor mobilization alert! All sectors assemble at highway toll immediately [ShortURL]', sentiment: 'negative', engagement_count: 1400, velocity_delta: 95, city: 'Bot Cluster Node', is_bot: 1 },
+
+      // Digital Arrest Scam
+      { topic_id: 'trend-digital-arrest-scam', topic_name: 'Digital Arrest & Cyber Extortion Rings', platform: 'X', author: 'CyberDost (MHA)', author_handle: '@CyberDost', snippet: 'NATIONAL ADVISORY: Police or Enforcement Directorate NEVER issues digital arrest warrants over Skype or WhatsApp.', sentiment: 'positive', engagement_count: 88500, velocity_delta: 62, city: 'New Delhi', is_bot: 0 },
+      { topic_id: 'trend-digital-arrest-scam', topic_name: 'Digital Arrest & Cyber Extortion Rings', platform: 'YouTube', author: 'Forensic Byte Investigator', author_handle: '@forensicbytes', snippet: 'Reverse Engineering the Digital Arrest Scam: Tracing mule account routing across border gateways.', sentiment: 'positive', engagement_count: 420000, velocity_delta: 48, city: 'Bengaluru', is_bot: 0 },
+      { topic_id: 'trend-digital-arrest-scam', topic_name: 'Digital Arrest & Cyber Extortion Rings', platform: 'Instagram', author: 'Senior Citizens Alert Hub', author_handle: '@senior_alert_in', snippet: 'Real incident: How a Pune bank manager recognized fear on a retired teacher’s face and stopped 45 Lakhs transfer.', sentiment: 'positive', engagement_count: 310000, velocity_delta: 33, city: 'Pune', is_bot: 0 },
+      { topic_id: 'trend-digital-arrest-scam', topic_name: 'Digital Arrest & Cyber Extortion Rings', platform: 'WhatsApp', author: 'Scam Broadcast Node', author_handle: '+91 82*** 9912', snippet: 'CBI Court Summons: Contraband parcel detained at Mumbai Customs. Contact Officer on video call [Fake Badge]', sentiment: 'negative', engagement_count: 2400, velocity_delta: 110, city: 'Mule IP Proxy', is_bot: 1 },
+
+      // Semiconductor Fab
+      { topic_id: 'trend-semiconductor-fab', topic_name: 'India Semiconductor Mission: 28nm Fabrication', platform: 'X', author: 'India Semiconductor Mission', author_handle: '@SemiconIndia', snippet: 'Commercial test wafers achieve 92.4% initial cleanroom yield at Dholera Mega Fab.', sentiment: 'positive', engagement_count: 64000, velocity_delta: 45, city: 'Gandhinagar', is_bot: 0 },
+      { topic_id: 'trend-semiconductor-fab', topic_name: 'India Semiconductor Mission: 28nm Fabrication', platform: 'YouTube', author: 'Sovereign Tech India', author_handle: '@sovtech_in', snippet: 'Inside India’s First Ultra-Pure Cleanroom: From Silica sand to automotive microcontrollers.', sentiment: 'positive', engagement_count: 280000, velocity_delta: 29, city: 'Ahmedabad', is_bot: 0 },
+      { topic_id: 'trend-semiconductor-fab', topic_name: 'India Semiconductor Mission: 28nm Fabrication', platform: 'Instagram', author: 'VLSI Silicon Hub', author_handle: '@vlsi_hub', snippet: 'Breakdown of 12,000 high-tech engineering job openings across Dholera, Sanand, and Hyderabad.', sentiment: 'positive', engagement_count: 82000, velocity_delta: 22, city: 'Hyderabad', is_bot: 0 },
+
+      // BRICS 2026
+      { topic_id: 'trend-brics-2026', topic_name: 'BRICS Sovereign Currency & Trade Corridor', platform: 'X', author: 'Diplomatic Dispatch', author_handle: '@indiadiplomacy', snippet: 'Multilateral settlement corridor formalised across 10 central banks with sovereign rupee clearing.', sentiment: 'positive', engagement_count: 51000, velocity_delta: 34, city: 'New Delhi', is_bot: 0 },
+      { topic_id: 'trend-brics-2026', topic_name: 'BRICS Sovereign Currency & Trade Corridor', platform: 'Telegram', author: 'BRICS Policy Wire', author_handle: '@brics_policy', snippet: 'Full text: Bilateral Trade Settlement & Tariff Modernisation Guidelines 2026 released.', sentiment: 'positive', engagement_count: 115000, velocity_delta: 28, city: 'Mumbai', is_bot: 0 }
+    ];
+
+    const stmt = db.prepare(`
+      INSERT INTO timeline_conversations (topic_id, topic_name, platform, author, author_handle, snippet, sentiment, engagement_count, velocity_delta, city, is_bot)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    seedData.forEach(d => {
+      stmt.run(d.topic_id, d.topic_name, d.platform, d.author, d.author_handle, d.snippet, d.sentiment, d.engagement_count, d.velocity_delta, d.city, d.is_bot);
+    });
+    stmt.finalize();
   });
 }
 
 function seedDefaultGovUsers() {
   const defaultUsers = [
     {
+      email: 'analyst@dhristi.gov',
+      name: 'Rohan Sharma',
+      role: 'Government Analyst',
+      clearance: 'LEVEL-3 INGESTION & ANALYSIS',
+      password_hash: 'SP-SEC-9942-0XF1A7',
+      otp_secret: '202609'
+    },
+    {
       email: 'analyst@socialpulse.gov',
       name: 'Rohan Sharma',
       role: 'Government Analyst',
       clearance: 'LEVEL-3 INGESTION & ANALYSIS',
       password_hash: 'SP-SEC-9942-0XF1A7',
+      otp_secret: '202609'
+    },
+    {
+      email: 'defense@dhristi.gov',
+      name: 'Col. Vikram Malhotra',
+      role: 'Defense/Threat Analyst',
+      clearance: 'LEVEL-4 TACTICAL INTELLIGENCE',
+      password_hash: 'DIR-DEF-7721-0X9B44',
       otp_secret: '202609'
     },
     {
@@ -153,11 +245,27 @@ function seedDefaultGovUsers() {
       otp_secret: '202609'
     },
     {
+      email: 'admin@dhristi.gov',
+      name: 'Dr. Ananya Roy',
+      role: 'Administrator',
+      clearance: 'LEVEL-5 GOVERNANCE & AUDIT',
+      password_hash: 'ADMIN-ROOT-2026-ALPHA',
+      otp_secret: '202609'
+    },
+    {
       email: 'admin@socialpulse.gov',
       name: 'Dr. Ananya Roy',
       role: 'Administrator',
       clearance: 'LEVEL-5 GOVERNANCE & AUDIT',
       password_hash: 'ADMIN-ROOT-2026-ALPHA',
+      otp_secret: '202609'
+    },
+    {
+      email: 'alex@dhristi.io',
+      name: 'Alex Vance',
+      role: 'Verified Creator',
+      clearance: 'VERIFIED CREATOR CLEARANCE',
+      password_hash: 'CREATOR-KEY-2026-X883',
       otp_secret: '202609'
     },
     {
@@ -416,11 +524,17 @@ function getProvenanceChain(contentId) {
 function getGovUserByEmail(email) {
   return new Promise((resolve, reject) => {
     const clean = (email || '').trim().toLowerCase();
-    const alias = clean.endsWith('@socialpulse.cyber')
-      ? clean.replace('@socialpulse.cyber', '@socialpulse.gov')
-      : (clean.endsWith('@socialpulse.gov') ? clean.replace('@socialpulse.gov', '@socialpulse.cyber') : clean);
+    const candidates = [
+      clean,
+      clean.replace('@dhristi.gov', '@socialpulse.gov'),
+      clean.replace('@socialpulse.gov', '@dhristi.gov'),
+      clean.replace('@dhristi.cyber', '@dhristi.gov'),
+      clean.replace('@socialpulse.cyber', '@socialpulse.gov'),
+      clean.replace('@dhristi.cyber', '@socialpulse.gov'),
+      clean.replace('@socialpulse.cyber', '@dhristi.gov')
+    ];
 
-    db.get('SELECT * FROM gov_users WHERE email = ? OR email = ?', [clean, alias], (err, row) => {
+    db.get('SELECT * FROM gov_users WHERE email IN (?, ?, ?, ?, ?, ?, ?)', candidates, (err, row) => {
       if (err) return reject(err);
       resolve(row);
     });
@@ -497,6 +611,70 @@ function deleteToken(key) {
   });
 }
 
+function getTimelineConversations(topicId, limit = 50) {
+  return new Promise((resolve, reject) => {
+    let query = 'SELECT * FROM timeline_conversations';
+    const params = [];
+    if (topicId && topicId !== 'all') {
+      const clean = String(topicId).replace(/[-_]/g, ' ').trim();
+      const words = clean.split(/\s+/).filter(w => w.length > 1);
+      if (words.length > 0) {
+        const clauses = words.map(() => '(topic_id LIKE ? OR topic_name LIKE ? OR snippet LIKE ?)');
+        query += ' WHERE (' + clauses.join(' OR ') + ')';
+        words.forEach(w => params.push(`%${w}%`, `%${w}%`, `%${w}%`));
+      } else {
+        query += ' WHERE topic_id LIKE ? OR topic_name LIKE ?';
+        params.push(`%${topicId}%`, `%${topicId}%`);
+      }
+    }
+    query += ' ORDER BY id DESC LIMIT ?';
+    params.push(limit);
+
+    db.all(query, params, (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows || []);
+    });
+  });
+}
+
+function addTimelineConversation(entry) {
+  return new Promise((resolve, reject) => {
+    const query = `
+      INSERT INTO timeline_conversations (topic_id, topic_name, platform, author, author_handle, snippet, sentiment, engagement_count, velocity_delta, city, is_bot)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.run(
+      query,
+      [
+        entry.topic_id || 'general',
+        entry.topic_name || 'Trending Discussion',
+        entry.platform || 'X',
+        entry.author || 'Anonymous User',
+        entry.author_handle || '@user',
+        entry.snippet || '',
+        entry.sentiment || 'neutral',
+        entry.engagement_count || 120,
+        entry.velocity_delta || 15,
+        entry.city || 'Pan-India',
+        entry.is_bot ? 1 : 0
+      ],
+      function (err) {
+        if (err) return reject(err);
+        resolve({ id: this.lastID, ...entry });
+      }
+    );
+  });
+}
+
+function getTimelineTopics() {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT DISTINCT topic_id, topic_name, COUNT(*) as post_count FROM timeline_conversations GROUP BY topic_id', [], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows || []);
+    });
+  });
+}
+
 module.exports = {
   db,
   saveToken,
@@ -514,6 +692,11 @@ module.exports = {
   recordLoginAttempt,
   getGovUserByEmail,
   addProvenanceBlock,
-  getProvenanceChain
+  getProvenanceChain,
+  // Real-Time Ingestion & Chronology Helpers
+  getTimelineConversations,
+  addTimelineConversation,
+  getTimelineTopics
 };
+
 

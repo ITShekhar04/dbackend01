@@ -63,8 +63,40 @@ app.use('/api/x', xRoutes);
 app.use('/api/copyright', copyrightRoutes);
 app.use('/api/gov', governmentRoutes);
 
+// Forward Multi-Platform REST Endpoints to FastAPI service (Port 8000)
+const FASTAPI_URL = process.env.FASTAPI_URL || 'http://localhost:8000';
+const MULTI_PLATFORM_ROUTES = [
+  '/api/health',
+  '/api/platforms',
+  '/api/trending',
+  '/api/content',
+  '/api/analytics',
+  '/api/state-pulse',
+  '/api/narrative-intelligence',
+  '/api/youtube/search',
+  '/api/instagram/search',
+  '/api/facebook/search',
+  '/api/x/search',
+  '/api/reddit/search',
+  '/api/news/search'
+];
+
+MULTI_PLATFORM_ROUTES.forEach(routePath => {
+  app.get(routePath, async (req, res, next) => {
+    try {
+      const targetUrl = new URL(req.originalUrl, FASTAPI_URL);
+      const upstream = await fetch(targetUrl.toString());
+      const data = await upstream.json();
+      return res.status(upstream.status).json(data);
+    } catch (err) {
+      next();
+    }
+  });
+});
+
 // Static Frontend Delivery for seamless development and testing
 app.use('/sih', express.static(path.resolve(__dirname, '../../sih')));
+app.use('/assets', express.static(path.resolve(__dirname, '../../forntend/assets')));
 
 // 4. Interactive API Dashboard & Documentation at Root (/)
 app.get('/', (req, res) => {
@@ -74,7 +106,7 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>SocialPulse AI - API Explorer</title>
+      <title>Dhristi AI - API Explorer</title>
       <style>
         :root {
           --bg: #07090e;
@@ -209,14 +241,17 @@ app.get('/', (req, res) => {
     <body>
       <div class="container">
         <div class="header">
-          <div class="brand">SocialPulse AI &bull; Backend Service</div>
+          <div class="brand" style="display: flex; align-items: center; gap: 10px;">
+            <img src="/assets/dhristi-logo.jpg" alt="Dhristi Logo" style="width: 32px; height: 32px; object-fit: cover; border-radius: 8px; border: 1px solid var(--cyan); box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">
+            <span>Dhristi AI &bull; Backend Service</span>
+          </div>
           <div class="status-badge">&bull; Service Online (Port ${config.port})</div>
         </div>
 
         <div class="card">
           <h2>Google OAuth 2.0 Authentication</h2>
           <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
-            Authorize SocialPulse AI with your YouTube Channel and YouTube Analytics to pull live creator data.
+            Authorize Dhristi AI with your YouTube Channel and YouTube Analytics to pull live creator data.
           </p>
           <a href="/auth/google" class="auth-btn">Connect Google Account (/auth/google)</a>
           <span style="margin-left: 15px; font-size: 0.85rem; color: var(--text-muted);">
@@ -235,7 +270,7 @@ app.get('/', (req, res) => {
 
           <div class="endpoint-row">
             <div><span class="method get">GET</span><span class="path">/api/videos</span></div>
-            <div class="desc">List of creator videos formatted to SocialPulse data contract</div>
+            <div class="desc">List of creator videos formatted to Dhristi data contract</div>
             <a href="/api/videos" target="_blank" class="test-btn">Test in Browser</a>
           </div>
 
@@ -406,7 +441,7 @@ if (require.main === module) {
   app.listen(config.port, '0.0.0.0', () => {
     console.log(`
 ============================================================
-🚀 SOCIALPULSE AI BACKEND SERVICE RUNNING
+🚀 DHRISTI AI BACKEND SERVICE RUNNING
 ============================================================
 📡 URL: http://localhost:${config.port}
 🔗 Google OAuth Start: http://localhost:${config.port}/auth/google

@@ -1,7 +1,7 @@
 {
-  "name": "socialpulse-backend",
+  "name": "dhristi-backend",
   "version": "1.0.0",
-  "description": "Backend service for SocialPulse AI creator-analytics dashboard",
+  "description": "Backend service for Dhristi AI creator-analytics dashboard",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {

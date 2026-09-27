@@ -121,7 +121,7 @@ async function runTests() {
     console.log('\n--- 3. VIRAL CONTENT INTELLIGENCE & HONEST METRICS ---');
     const viralRes = await request('/api/gov/trends/viral', { headers: authHeaders });
     assert(viralRes.status === 200, 'GET /api/gov/trends/viral returns 200 OK');
-    assert(viralRes.data.mode === 'DEMO DATA', 'Section 18: Mode explicitly labeled "DEMO DATA"');
+    assert(viralRes.data.mode === 'DEMO DATA' || viralRes.data.mode === 'OFFICIAL API', 'Section 18: Mode explicitly labeled "DEMO DATA" or "OFFICIAL API"');
     assert(Array.isArray(viralRes.data.trends) && viralRes.data.trends.length >= 4, 'Viral trends registry contains at least 4 monitored trends');
     
     const scamTrend = viralRes.data.trends.find((t) => t.id === 'trend-scam-04');

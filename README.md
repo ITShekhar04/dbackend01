@@ -1,6 +1,6 @@
-# SocialPulse AI — Creator Analytics Backend Service
+# Dhristi AI — Creator Analytics Backend Service
 
-A high-performance Node.js & Express backend for **SocialPulse AI**. It interfaces directly with the **YouTube Data API v3** and **YouTube Analytics API v2** (with an **Instagram Graph API** stretch architecture) to fetch, normalize, and serve creator analytics in the **exact JSON data contract** expected by the frontend dashboard.
+A high-performance Node.js & Express backend for **Dhristi AI**. It interfaces directly with the **YouTube Data API v3** and **YouTube Analytics API v2** (with an **Instagram Graph API** stretch architecture) to fetch, normalize, and serve creator analytics in the **exact JSON data contract** expected by the frontend dashboard.
 
 ---
 
