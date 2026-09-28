@@ -292,5 +292,30 @@ def get_content_count() -> int:
     except Exception:
         return 0
 
+def get_platform_hashtag_trends(platform: str = "instagram", limit: int = 15) -> List[Dict[str, Any]]:
+    """Analyzes and ranks hashtag trends from collected platform content in the database."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT h.tag_or_topic as hashtag,
+                   COUNT(h.id) as post_count,
+                   COALESCE(SUM(c.engagement), 0) as total_engagement,
+                   COALESCE(AVG(c.sentiment_score), 0.0) as avg_sentiment
+            FROM hashtags_topics h
+            LEFT JOIN content c ON h.content_id = c.content_id AND h.platform = c.platform
+            WHERE h.platform = ?
+            GROUP BY h.tag_or_topic
+            ORDER BY total_engagement DESC, post_count DESC
+            LIMIT ?;
+        """, (platform, limit))
+        rows = cursor.fetchall()
+        results = [dict(row) for row in rows]
+        conn.close()
+        return results
+    except Exception as e:
+        logger.error("Failed to query platform hashtag trends: %s", e)
+        return []
+
 # Auto-initialize database on import
 init_db()

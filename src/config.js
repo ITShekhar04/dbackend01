@@ -66,8 +66,9 @@ const config = {
   },
 
   telegram: {
-    apiKey: process.env.TELEGRAM_API_KEY || process.env.TELEGRAM_API_HASH || '',
-    apiHash: process.env.TELEGRAM_API_HASH || process.env.TELEGRAM_API_KEY || ''
+    apiId: process.env.TELEGRAM_API_ID || process.env.TELEGRAM_API_KEY || '',
+    apiKey: process.env.TELEGRAM_API_KEY || process.env.TELEGRAM_API_ID || '',
+    apiHash: process.env.TELEGRAM_API_HASH || ''
   }
 };
 

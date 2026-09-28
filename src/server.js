@@ -64,7 +64,10 @@ app.use('/api/copyright', copyrightRoutes);
 app.use('/api/gov', governmentRoutes);
 
 // Forward Multi-Platform REST Endpoints to FastAPI service (Port 8000)
-const FASTAPI_URL = process.env.FASTAPI_URL || 'http://localhost:8000';
+let FASTAPI_URL = process.env.FASTAPI_URL || 'http://localhost:8000';
+if (FASTAPI_URL && !FASTAPI_URL.startsWith('http://') && !FASTAPI_URL.startsWith('https://')) {
+  FASTAPI_URL = `http://${FASTAPI_URL}${FASTAPI_URL.includes(':') ? '' : ':8000'}`;
+}
 const MULTI_PLATFORM_ROUTES = [
   '/api/health',
   '/api/platforms',
@@ -76,6 +79,9 @@ const MULTI_PLATFORM_ROUTES = [
   '/api/youtube/search',
   '/api/instagram/search',
   '/api/facebook/search',
+  '/api/facebook/status',
+  '/api/facebook/pages',
+  '/api/facebook/feed',
   '/api/x/search',
   '/api/reddit/search',
   '/api/news/search'

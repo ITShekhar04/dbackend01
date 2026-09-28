@@ -37,6 +37,9 @@ class Settings:
     YOUTUBE_REFERER: str = os.getenv("YOUTUBE_REFERER", "").strip()
     INSTAGRAM_ACCESS_TOKEN: str = os.getenv("INSTAGRAM_ACCESS_TOKEN", "").strip()
     INSTAGRAM_ACCOUNT_ID: str = os.getenv("INSTAGRAM_ACCOUNT_ID", "").strip()
+    INSTAGRAM_APP_ID: str = os.getenv("INSTAGRAM_APP_ID", os.getenv("FB_APP_ID", "")).strip()
+    INSTAGRAM_APP_SECRET: str = os.getenv("INSTAGRAM_APP_SECRET", os.getenv("FB_APP_SECRET", "")).strip()
+    INSTAGRAM_REDIRECT_URI: str = os.getenv("INSTAGRAM_REDIRECT_URI", "http://localhost:5000/api/instagram/auth/callback").strip()
     FACEBOOK_ACCESS_TOKEN: str = os.getenv("FACEBOOK_ACCESS_TOKEN", "").strip()
     FACEBOOK_PAGE_ID: str = os.getenv("FACEBOOK_PAGE_ID", "").strip()
     X_API_KEY: str = os.getenv("X_API_KEY", "").strip()
@@ -44,8 +47,12 @@ class Settings:
     X_BEARER_TOKEN: str = os.getenv("X_BEARER_TOKEN", "").strip()
     X_ACCESS_TOKEN: str = os.getenv("X_ACCESS_TOKEN", "").strip()
     X_ACCESS_TOKEN_SECRET: str = os.getenv("X_ACCESS_TOKEN_SECRET", "").strip()
-    TELEGRAM_API_KEY: str = os.getenv("TELEGRAM_API_KEY", "").strip()
+    TELEGRAM_API_ID: str = os.getenv("TELEGRAM_API_ID", os.getenv("TELEGRAM_API_KEY", "")).strip()
+    TELEGRAM_API_KEY: str = os.getenv("TELEGRAM_API_KEY", os.getenv("TELEGRAM_API_ID", "")).strip()
     TELEGRAM_API_HASH: str = os.getenv("TELEGRAM_API_HASH", "").strip()
+    TELEGRAM_PHONE: str = os.getenv("TELEGRAM_PHONE", "").strip()
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+    TELEGRAM_SESSION_STRING: str = os.getenv("TELEGRAM_SESSION_STRING", "").strip()
     REDDIT_CLIENT_ID: str = os.getenv("REDDIT_CLIENT_ID", "").strip()
     REDDIT_CLIENT_SECRET: str = os.getenv("REDDIT_CLIENT_SECRET", "").strip()
     REDDIT_USER_AGENT: str = os.getenv("REDDIT_USER_AGENT", "DhristiIntelligence/1.0").strip()
@@ -71,7 +78,7 @@ class Settings:
 
     @property
     def is_telegram_configured(self) -> bool:
-        return bool(self.TELEGRAM_API_KEY or self.TELEGRAM_API_HASH)
+        return bool((self.TELEGRAM_API_ID or self.TELEGRAM_API_KEY) and self.TELEGRAM_API_HASH)
 
     @property
     def is_reddit_configured(self) -> bool:

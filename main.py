@@ -101,10 +101,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Middleware (Frontend on port 3000, 5000, etc.)
+# CORS Middleware (Frontend on port 3000, 5000, Render, etc.)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS if settings.CORS_ORIGINS else ["*"],
+    allow_origin_regex=r"https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
